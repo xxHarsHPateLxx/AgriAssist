@@ -1,7 +1,6 @@
 # main.py
 
 import os
-import re
 import joblib
 import numpy as np
 from dotenv import load_dotenv
