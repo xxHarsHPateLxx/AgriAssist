@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Thermometer, CloudRain, Cloud } from 'lucide-react';
+import { Sun, Thermometer, CloudRain } from 'lucide-react';
 
 const WeatherCard = ({ animateCards, weather, error, season }) => {
 
@@ -39,9 +39,11 @@ const WeatherCard = ({ animateCards, weather, error, season }) => {
 
           {/* Condition */}
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <Cloud className="w-8 h-8 text-white" />
+
+            <div className='flex items-center justify-center mx-auto mb-3 w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-400 to-gray-600'>
+              <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`} alt="" />
             </div>
+
             <p className="text-sm text-gray-500 font-medium">Condition</p>
             <p className="text-lg font-bold text-gray-800 capitalize">{weather.condition}</p>
           </div>

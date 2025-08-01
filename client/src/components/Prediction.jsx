@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BarChart3 } from 'lucide-react';
-import { samplePredictions } from '../data';
 
 const Prediction = () => {
 
@@ -9,7 +8,7 @@ const Prediction = () => {
   const [predictionForm, setPredictionForm] = useState({
     crop: '',
     temperature: '',
-    soil_moisture: '',    
+    soil_moisture: '',
     soil_ph: '',
     fertilizer_content: '',
     sunlight: ''
@@ -17,9 +16,9 @@ const Prediction = () => {
 
   const handlePrediction = (e) => {
     e.preventDefault();
-    
-    if (predictionForm.crop && predictionForm.soil_moisture && predictionForm.soil_ph && predictionForm.temperature && predictionForm.fertilizer_content && predictionForm.sunlight) {
-      
+
+    if (predictionForm.soil_moisture && predictionForm.soil_ph && predictionForm.temperature && predictionForm.fertilizer_content && predictionForm.sunlight) {
+
       const reqOptions = {
         method: 'POST',
         headers: {
@@ -38,21 +37,25 @@ const Prediction = () => {
         .then(response => response.json())
         .then(data => {
           setpredictedYield(data.predicted_yield);
+
+          const prediction = {
+            crop: predictionForm.crop,
+            temperature: predictionForm.temperature,
+            yield: data.predicted_yield,
+            date: new Date().toLocaleDateString()
+          };
+
+          setPredictions(prev => [prediction, ...prev]);
+
+          setPredictionForm({
+            crop: '', soil_moisture: '', soil_ph: '', temperature: '', fertilizer_content: '', sunlight: ''
+          });
+
         })
         .catch(error => {
           console.error(error);
         });
-      
-      const prediction = {
-        crop: predictionForm.crop,
-        temperature: predictionForm.temperature,
-        yield: predictedYield,
-        date: new Date().toLocaleDateString()
-      };
 
-      setpredictedYield(prediction.yield)
-      setPredictions([prediction, ...predictions]);
-      setPredictionForm({ crop: '', soil_moisture: '', soil_ph: '', temperature: '', fertilizer_content: '', sunlight: ''});
     }
   };
 

@@ -24,7 +24,7 @@ const Dashboard = () => {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   const { user } = useAuth();
-
+  const now = Date.now();
 
 
   const governmentSchemes = [
@@ -110,7 +110,18 @@ const Dashboard = () => {
     }
   ];
 
-
+  const fetchWeather = async (lat, lon) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/weather?lat=${lat}&lon=${lon}`);
+      const data = await res.json();
+      setWeather(data);
+      localStorage.setItem('weather', JSON.stringify(data));
+      localStorage.setItem('weatherTimestamp', now);
+    } catch (err) {
+      setError("Unable to fetch weather");
+      console.error(err);
+    }
+  };
 
 
   useEffect(() => {
@@ -120,33 +131,33 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const fetchWeather = async (lat, lon) => {
-      try {
-        const res = await fetch(`http://localhost:8000/api/weather?lat=${lat}&lon=${lon}`);
-        const data = await res.json();
-        setWeather(data);
-      } catch (err) {
-        setError("Unable to fetch weather");
-        console.error(err);
-      }
-    };
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const { latitude, longitude } = pos.coords;
-          fetchWeather(latitude, longitude);
-        },
-        err => {
-          setError("Location access denied");
-          console.error(err);
-        }
-      );
+    const cachedWeather = localStorage.getItem('weather');
+    const cacheTime = localStorage.getItem('weatherTimestamp');
+
+
+    if (cachedWeather && cacheTime && now - cacheTime < 30 * 60 * 1000) {
+      // use cached data
+      setWeather(JSON.parse(cachedWeather));
     } else {
-      setError("Geolocation not supported");
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            const { latitude, longitude } = pos.coords;
+            fetchWeather(latitude, longitude);
+          },
+          err => {
+            setError("Location access denied");
+            console.error(err);
+          }
+        );
+      } else {
+        setError("Geolocation not supported");
+      }
     }
-  }, []);
 
+
+  }, []);
 
 
   return (
