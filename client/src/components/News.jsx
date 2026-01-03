@@ -10,7 +10,7 @@ const News = () => {
   const fetchNews = async () => {
     try {
       setError('');
-      const response = await fetch('http://localhost:8000/news');
+      const response = await fetch('https://agriassist-llyw.onrender.com/news');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

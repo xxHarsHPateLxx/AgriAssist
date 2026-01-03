@@ -112,7 +112,7 @@ const Dashboard = () => {
 
   const fetchWeather = async (lat, lon) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/weather?lat=${lat}&lon=${lon}`);
+      const res = await fetch(`https://agriassist-llyw.onrender.com/api/weather?lat=${lat}&lon=${lon}`);
       const data = await res.json();
       setWeather(data);
       localStorage.setItem('weather', JSON.stringify(data));
@@ -167,7 +167,7 @@ const Dashboard = () => {
         <div className="bg-gradient-to-r from-emerald-500 via-green-600 to-teal-600 rounded-3xl p-10 text-white shadow-2xl transform hover:scale-[1.01] transition-all duration-300 animate-fadeInUp">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h2 className="text-4xl font-bold mb-2">Welcome back, {user?.displayName || 'Farmer'} 👋</h2>
+              <h2 className="text-4xl font-bold mb-2">Welcome, {user?.displayName || 'Farmer'} 👋</h2>
               <p className="text-xl text-white/90 mb-4">Let's grow smarter today 🌾</p>
               <div className="flex items-center space-x-6 text-white/80">
                 <div className="flex items-center space-x-2 bg-white/20 px-4 py-2 rounded-full">

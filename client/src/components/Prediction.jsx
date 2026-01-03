@@ -33,7 +33,7 @@ const Prediction = () => {
         })
       };
 
-      fetch('http://localhost:8000/predict', reqOptions)
+      fetch('https://agriassist-llyw.onrender.com/predict', reqOptions)
         .then(response => response.json())
         .then(data => {
           setpredictedYield(data.predicted_yield);
