@@ -20,6 +20,7 @@ load_dotenv()
 # Constants
 BASE_DIR = Path(__file__).resolve().parent
 FAISS_INDEX_FILE = BASE_DIR / "faiss_index" / "index.faiss"
+YIELD_MODEL_FILE = BASE_DIR / "yield_model.pkl"
 
 
 def ensure_faiss_index() -> None:
@@ -37,8 +38,24 @@ def ensure_faiss_index() -> None:
         raise RuntimeError("FAISS index missing after ingest.py run")
 
 
-# Build vector index before loading LLM chain
+def ensure_yield_model() -> None:
+    """Ensure yield prediction model exists; train via prediction.py if missing."""
+    if YIELD_MODEL_FILE.exists():
+        return
+
+    prediction_path = BASE_DIR / "prediction.py"
+    try:
+        subprocess.run([sys.executable, str(prediction_path)], cwd=BASE_DIR, check=True)
+    except subprocess.CalledProcessError as exc:  # pragma: no cover - startup guard
+        raise RuntimeError("Failed to train model via prediction.py") from exc
+
+    if not YIELD_MODEL_FILE.exists():  # pragma: no cover - startup guard
+        raise RuntimeError("Model file missing after prediction.py run")
+
+
+# Build vector index and train model before loading
 ensure_faiss_index()
+ensure_yield_model()
 
 from llm import rag_chain
 

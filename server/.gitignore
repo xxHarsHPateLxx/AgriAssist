@@ -41,6 +41,4 @@ Thumbs.db
 
 # Project specific
 faiss_index/
-*.csv
 *.pkl
-*.pickle
