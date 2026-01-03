@@ -1,6 +1,8 @@
 # main.py
 
 import os
+import subprocess
+import sys
 from pathlib import Path
 import joblib
 import numpy as np
@@ -9,12 +11,36 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from llm import rag_chain
 from news_routes import router as news_router
 from weather_routes import router as weather_router
 
 # Load environment variables
 load_dotenv()
+
+# Constants
+BASE_DIR = Path(__file__).resolve().parent
+FAISS_INDEX_FILE = BASE_DIR / "faiss_index" / "index.faiss"
+
+
+def ensure_faiss_index() -> None:
+    """Ensure FAISS index exists; build via ingest.py if missing."""
+    if FAISS_INDEX_FILE.exists():
+        return
+
+    ingest_path = BASE_DIR / "ingest.py"
+    try:
+        subprocess.run([sys.executable, str(ingest_path)], cwd=BASE_DIR, check=True)
+    except subprocess.CalledProcessError as exc:  # pragma: no cover - startup guard
+        raise RuntimeError("Failed to build FAISS index via ingest.py") from exc
+
+    if not FAISS_INDEX_FILE.exists():  # pragma: no cover - startup guard
+        raise RuntimeError("FAISS index missing after ingest.py run")
+
+
+# Build vector index before loading LLM chain
+ensure_faiss_index()
+
+from llm import rag_chain
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -31,9 +57,6 @@ app.add_middleware(
 # Include additional routes
 app.include_router(news_router)
 app.include_router(weather_router)
-
-# Constants
-BASE_DIR = Path(__file__).resolve().parent
 
 
 # Load yield prediction model
